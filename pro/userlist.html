@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script>
+        function getList() {
+            let xhr = new XMLHttpRequest();
+            xhr.onreadystatechange=function () {
+                if(xhr.readyState==4&&xhr.status==200){
+                    let result = xhr.responseText;
+                    let arr = JSON.parse(result);
+                    let strHTML=`
+                        <table align="center" border="1" bordercolor="blue">
+                            <tr>
+                                <th>用户名称</th>
+                                <th>电子邮箱</th>
+                                <th>联系方式</th>
+                                <th>真实姓名</th>
+                                <th>用户性别</th>
+                                <th>操作</th>
+                            </tr>
+                    `;
+                    for(let i=0;i<arr.length;i++){
+                        let gender = arr[i].gender==1?'男':'女';
+                        let user_name =arr[i].user_name==null? "不详":arr[i].user_name;
+                        strHTML+=`
+                            <tr>
+                                <td>${arr[i].uname}</td>
+                                <td>${arr[i].email}</td>
+                                <td>${arr[i].phone}</td>
+                                <td>${user_name}</td>
+                                <td>${gender}</td>
+                                <td>
+                                    <a href="searuser.html?uid=${arr[i].uid}">修改</a>
+                                    <a href="javascript:deluser(${arr[i].uid})">删除</a>
+                                </td>
+                            </tr>
+                        `;
+                    }
+                    strHTML+="</table>";
+                    d1.innerHTML=strHTML;
+                }
+            };
+            xhr.open("get","/pro/v1/userlist",true);
+            xhr.send();
+        }
+        function deluser($uid) {
+            let xhr = new XMLHttpRequest();
+            xhr.onreadystatechange=function(){
+                if(xhr.readyState==4&&xhr.status==200){
+                    let result = xhr.responseText;
+                    if(result==1){
+                        alert("删除成功")
+                        getList();
+                    }else {
+                        alert("删除失败")
+                    }
+                }
+            }
+            xhr.open("delete",`/pro/v1/delUser/${$uid}`,true);
+            xhr.send();
+        }
+    </script>
+</head>
+<body onload="getList()">
+    <div id="d1"></div>
+</body>
+</html>

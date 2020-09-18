@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script>
+        let uname_check=false;
+        let email_check=false;
+        let phone_check=false;
+        let user_name_check=false;
+        function search() {
+            //1.从userlist.html页面获取uid
+            let urlSearchParams = new URLSearchParams(location.search);
+            let $uid = urlSearchParams.get("uid");
+            console.log($uid)
+            //2.创建ajax并发送请求就收响应
+            let xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    let result = xhr.responseText;
+                    let obj = JSON.parse(result);
+                    console.log(obj)
+                    uname.value = obj.uname;
+                    email.value = obj.email;
+                    phone.value = obj.phone;
+                    user_name.value = obj.user_name==null?"不详":obj.user_name;
+                    if(obj.gender == 1){
+                        man.checked=true;
+                    }else if(obj.gender==0){
+                        woman.checked=true;
+                    }
+                }
+            }
+            xhr.open("get", `/pro/v1/searchUser/${$uid}`, true)
+            xhr.send();
+        }
+        function show_uname() {
+            uname_msg.innerHTML="用户名不能为空";
+        }
+        function show_email() {
+            email_msg.innerHTML="电子邮箱不能为空";
+        }
+        function show_phone() {
+            phone_msg.innerHTML="联系方式不能为空";
+        }
+        function show_user_name() {
+            user_name_msg.innerHTML="真实姓名不能为空";
+        }
+        function check_uname() {
+            if(!uname.value){
+                uname_msg.innerHTML="×";
+                uname_check=false;
+            }else{
+                uname_msg.innerHTML="√";
+                uname_check=true;
+            }
+        }
+        function check_email() {
+            if(!email.value){
+                email_msg.innerHTML="×";
+                email_check=false;
+            }else{
+                email_msg.innerHTML="√";
+                email_check=true;
+            }
+        }
+        function check_phone() {
+            if(!phone.value){
+                phone_msg.innerHTML="×";
+                phone_check=false;
+            }else{
+                phone_msg.innerHTML="√";
+                phone_check=true;
+            }
+        }
+        function check_user_name() {
+            if(!user_name.value){
+                user_name_msg.innerHTML="×";
+                user_name_check==false;
+            }else{
+                user_name_msg.innerHTML="√";
+                user_name_check==true;
+            }
+        }
+        function update() {
+            if(!uname_check&&!email_check&&!phone_check&&!user_name_check){
+                alert("信息不完整");
+                return;
+            }
+            //获取地址栏中的uid
+            let urlSearchParams = new URLSearchParams(location.search);
+            let $uid = urlSearchParams.get("uid");
+            let $uname = uname.value;
+            let $email = email.value;
+            let $phone = phone.value;
+            let $user_name = user_name.value;
+            if(man.checked){
+                $gender=1;
+            }else if(woman.checked){
+                $gender=0;
+            }
+            let xhr = new XMLHttpRequest();
+            xhr.onreadystatechange=function () {
+                if(xhr.readyState==4&&xhr.status==200){
+                    let result = xhr.responseText;
+                    if(result==1){
+                        alert("修改成功");
+                        location.href="userlist.html";
+                    }else{
+                        alert("修改失败");
+                    }
+                }
+            }
+            xhr.open("put","/pro/v1/updateUser",true);
+            xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+            let formdata=`uid=${$uid}&uname=${$uname}&email=${$email}&phone=${$phone}&user_name=${$user_name}&gender=${$gender}`;
+            console.log(formdata)
+            xhr.send(formdata);
+        }
+    </script>
+</head>
+<body onload="search()">
+    <p>
+        <input onfocus="show_uname()" onblur="check_uname()" type="text" id="uname">
+        <sapn id="uname_msg"></sapn>
+    </p>
+    <p>
+        <input onfocus="show_email()" onblur="check_email()" type="text" id="email">
+        <sapn id="email_msg"></sapn>
+    </p>
+    <p>
+        <input onfocus="show_phone()" onblur="check_phone()" type="text" id="phone">
+        <sapn id="phone_msg"></sapn>
+    </p>
+    <p>
+        <input onfocus="show_user_name()" onblur="check_user_name()" type="text" id="user_name">
+        <sapn id="user_name_msg"></sapn>
+    </p>
+    <p>
+        <input type="radio" id="man" name="gender">
+        <label for="man">男</label>
+        <input type="radio" id="woman" name="gender">
+        <label for="woman">女</label>
+    </p>
+    <button onclick="update()">修改</button>
+</body>
+</html>

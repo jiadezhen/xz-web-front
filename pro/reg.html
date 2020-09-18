@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script>
+        let uname_check=false;
+        let upwd_check=false;
+        let cpwd_check=false;
+        let email_check=false;
+        let phone_check=false;
+        let user_name_check=false;
+        function uname_show() {
+            uname_msg.innerHTML="用户名6~12位";
+        }
+        function upwd_show() {
+            upwd_msg.innerHTML="密码6~8位";
+        }
+        function cpwd_show() {
+            cpwd_msg.innerHTML="两次输入密码要一致";
+        }
+        function email_show() {
+            email_msg.innerHTML="必填";
+        }
+        function phone_show() {
+            phone_msg.innerHTML="必填";
+        }
+        function user_name_show() {
+            user_name_msg.innerHTML="必填";
+        }
+        function check_uname() {
+            if(!uname.value){
+                uname_msg.innerHTML="用户名为空";
+                uname_check = false;
+            }else if(uname.value.length>=6&&uname.value.length<=12){
+                let $uname = uname.value;
+                let xhr = new XMLHttpRequest();
+                xhr.onreadystatechange=function(){
+                    if(xhr.readyState==4&&xhr.status==200){
+                        let result = xhr.responseText;
+                        if(result==1){
+                            uname_msg.innerHTML="该用户已存在,不能注册";
+                            uname_check = false;
+                        }else if(result==0) {
+                            uname_msg.innerHTML="√";
+                            uname_check = true;
+                        }else{
+                            uname_msg.innerHTML="×";
+                            uname_check = false;
+                        }
+                    }
+                }
+                xhr.open("get","/pro/v1/queryUser/"+$uname,true);
+                xhr.send();
+            }else {
+                uname_msg.innerHTML="×";
+                uname_check = false;
+            }
+        }
+        function check_upwd() {
+            if(!upwd.value){
+                upwd_msg.innerHTML="密码为空";
+                upwd_check=false;
+            }else if(upwd.value.length>=6&&upwd.value.length<=8){
+                upwd_msg.innerHTML="√";
+                upwd_check=true;
+            }else {
+                upwd_msg.innerHTML="×";
+                upwd_check=false;
+            }
+        }
+        function check_cpwd() {
+            if(cpwd.value==upwd.value){
+                if(upwd.value){
+                    cpwd_msg.innerHTML="√";
+                    cpwd_check = true;
+                }else{
+                    cpwd_msg.innerHTML="×";
+                    cpwd_check =false;
+                }
+            }else {
+                cpwd_msg.innerHTML="×";
+                cpwd_check =false;
+            }
+        }
+        function check_email() {
+            if(email.value){
+                email_msg.innerHTML="√";
+                email_check=true;
+            }else {
+                email_msg.innerHTML="×";
+                email_check=false;
+            }
+        }
+        function check_phone() {
+            if(phone.value){
+                phone_msg.innerHTML="√";
+                phone_check=true;
+            }else {
+                phone_msg.innerHTML="×";
+                phone_check=false;
+            }
+        }
+        function check_user_name() {
+            if(user_name.value){
+                user_name_msg.innerHTML="√";
+                user_name_check=true;
+            }else {
+                user_name_msg.innerHTML="×";
+                user_name_check=false;
+            }
+        }
+        function reg() {
+            if(!uname_check&&!upwd_check&&!cpwd_check&&!email_check&!phone_check&&!user_name_check){
+                alert("信息不完整");
+                return;
+            }
+            let $uname = uname.value;
+            let $upwd = upwd.value;
+            let $email = email.value;
+            let $phone = phone.value;
+            let $user_name = user_name.value;
+            let $gender = man.checked?"1":"0";
+            let xhr = new XMLHttpRequest();
+            xhr.onreadystatechange=function () {
+                if(xhr.readyState==4&&xhr.status==200){
+                    let result = xhr.responseText;
+                    if(result==1){
+                        alert("注册成功");
+                        location.href="login.html";
+                    }else {
+                        alert("注册失败");
+                    }
+                }
+            }
+            xhr.open("post","/pro/v1/reg",true);
+            xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+            let formdata=`uname=${$uname}&upwd=${$upwd}&email=${$email}&phone=${$phone}&user_name=${$user_name}&gender=${$gender}`;
+            xhr.send(formdata);
+        }
+    </script>
+</head>
+<body>
+    <p>
+        <input onfocus="uname_show()" onblur="check_uname()" type="text" id="uname">
+        <span id="uname_msg"></span>
+    </p>
+    <p>
+        <input onfocus="upwd_show()" onblur="check_upwd()" type="text" id="upwd">
+        <span id="upwd_msg"></span>
+    </p>
+    <p>
+        <input onfocus="cpwd_show()" onblur="check_cpwd()" type="text" id="cpwd">
+        <span id="cpwd_msg"></span>
+    </p>
+    <p>
+        <input onfocus="email_show()" onblur="check_email()" type="text" id="email">
+        <span id="email_msg"></span>
+    </p>
+    <p>
+        <input onfocus="phone_show()" onblur="check_phone()" type="text" id="phone">
+        <span id="phone_msg"></span>
+    </p>
+    <p>
+        <input onfocus="user_name_show()" onblur="check_user_name()" type="text" id="user_name">
+        <span id="user_name_msg"></span>
+    </p>
+    <p>
+        <input checked type="radio" id="man" name="gender">
+        <label for="man">男</label>
+        <input type="radio" id="woman" name="gender">
+        <label for="woman">女</label>
+    </p>
+    <button onclick="reg()">注册</button>
+</body>
+</html>

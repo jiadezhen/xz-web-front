@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script>
+        function deluser() {
+            let $uid = uid.value;
+            let xhr = new XMLHttpRequest();
+            xhr.onreadystatechange=function(){
+                if(xhr.readyState==4&&xhr.status==200){
+                    let result = xhr.responseText;
+                    if(result==1){
+                        alert("删除成功")
+                    }else {
+                        alert("删除失败")
+                    }
+                }
+            }
+            xhr.open("delete",`/pro/v1/delUser/${$uid}`,true);
+            xhr.send();
+        }
+    </script>
+</head>
+<body>
+    <input type = "text" id="uid"><br>
+    <button onclick="deluser()">删除</button>
+</body>
+</html> 

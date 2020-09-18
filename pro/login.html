@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script>
+        let uname_check = false;
+        let upwd_check = false;
+        function login() {
+            if (uname_check!=true||upwd_check!=true){
+                alert("用户名,密码必填")
+                return;
+            }
+            let $uname = uname.value;
+            let $upwd = upwd.value;
+            let xhr = new XMLHttpRequest();
+            xhr.onreadystatechange=function(){
+                if(xhr.readyState==4&&xhr.status==200){
+                    let result = xhr.responseText;
+                    if(result==1){
+                        alert("登录成功");
+                        location.href="userlist.html";
+                    }else {
+                        alert("用户名或密码错误");
+                    }
+                }
+            };
+            xhr.open("get",`/pro/v1/login/${$uname}&${$upwd}`,true);
+            xhr.send();
+        }
+        function show_uname() {
+            uname_msg.innerHTML="用户名不能为空";
+        }
+        function show_upwd() {
+            upwd_msg.innerHTML="密码不能为空";
+        }
+        function check_uname() {
+            if(!uname.value){
+                uname_check = false;
+                uname_msg.innerHTML="×";
+            }else {
+                uname_check = true;
+                uname_msg.innerHTML="√";
+            }
+        }
+        function check_upwd() {
+            if(!upwd.value){
+                upwd_check = false;
+                upwd_msg.innerHTML="×";
+            }else {
+                upwd_check = true;
+                upwd_msg.innerHTML="√";
+            }
+        }
+    </script>
+</head>
+<body>
+    <p>
+        <input onfocus="show_uname()" onblur="check_uname()" type="text" id="uname" placeholder="用户名6-12位">
+        <span id="uname_msg"></span>
+    </p>
+    <p>
+        <input onfocus="show_upwd()" onblur="check_upwd()" type="text" id="upwd" placeholder="密码6-8位">
+        <span id="upwd_msg"></span>
+    </p>
+    <button onclick="login()">登录</button>
+</body>
+</html>
